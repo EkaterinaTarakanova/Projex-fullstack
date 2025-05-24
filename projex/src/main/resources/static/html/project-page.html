@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление проектом</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <nav class="main-nav">
+        <div class="main-nav__inner">
+            <div class="main-nav__left">
+                <a href="Index.html" class="main-nav__logo"><b>Projex</b></a>
+                <div class="main-nav__links">
+                    <a href="Index.html" class="main-nav__link">Проекты</a>
+                    <a href="project-tasks.html" class="main-nav__link">Задачи</a>
+                </div>
+            </div>
+            <div class="main-nav__right">
+                <div class="main-nav__profile">
+                    <a href="profile.html" class="main-nav__profile-link">
+                        <span class="main-nav__avatar">ИП</span>
+                        <span class="main-nav__username">Иван Петров</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>Проект: The Revenants</h1>
+            <button id="create-task-btn" class="create-task-btn">Создать задачу</button>
+        </div>
+
+        <div class="content">
+            <div class="info-section">
+                <div class="project-info">
+                    <h2>Информация о проекте</h2>
+                    <div class="info-item">
+                        <span class="label">Статус:</span>
+                        <span class="value"><span class="status-dev">В разработке</span></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Дедлайн:</span>
+                        <span class="value">2025-04-30</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Прогресс:</span>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 35%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="participants">
+                    <h2>Участники проекта</h2>
+                    <div class="participants-list">
+                        <!-- Список участников будет заполнен динамически -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="tasks-section">
+                <h2>Задачи</h2>
+                <table class="tasks-table">
+                    <thead>
+                        <tr>
+                            <th>Задача</th>
+                            <th>Исполнитель</th>
+                            <th>Статус</th>
+                            <th>Дедлайн</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tasks-tbody">
+                        <!-- Список задач будет заполнен динамически -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for creating a new task -->
+    <div id="task-modal" class="task-modal">
+        <div class="task-modal-overlay" id="modal-overlay"></div>
+        <div class="task-modal-content">
+            <h2>Создать новую задачу</h2>
+            <form id="task-form">
+                <div class="form-group">
+                    <label for="task-name">Название задачи</label>
+                    <input type="text" id="task-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-description">Описание</label>
+                    <textarea id="task-description" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="task-assignee">Исполнитель</label>
+                    <select id="task-assignee" required>
+                        <option value="" disabled selected>Выберите исполнителя</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-priority">Приоритет</label>
+                    <select id="task-priority">
+                        <option value="low">Низкий</option>
+                        <option value="medium" selected>Средний</option>
+                        <option value="high">Высокий</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-deadline">Дедлайн</label>
+                    <input type="date" id="task-deadline" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="cancel-btn" class="btn-cancel">Отменить</button>
+                    <button type="submit" class="btn-save">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/storage.js"></script>
+    <script src="/js/project-page.js"></script>
+</body>
+
+</html>

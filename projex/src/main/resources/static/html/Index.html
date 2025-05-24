@@ -1,0 +1,200 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проекты</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <nav class="main-nav">
+        <div class="main-nav__inner">
+            <div class="main-nav__left">
+                <a href="Index.html" class="main-nav__logo"><b>Projex</b></a>
+                <div class="main-nav__links">
+                    <a href="Index.html" class="main-nav__link active">Проекты</a>
+                    <!-- Ссылки будут добавлены динамически через JavaScript в зависимости от роли -->
+                </div>
+            </div>
+            <div class="main-nav__right">
+                <div class="main-nav__profile">
+                    <a href="profile.html" class="main-nav__profile-link">
+                        <span class="main-nav__avatar"></span>
+                        <span class="main-nav__username"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="title">Проекты</h1>
+            <div class="header-actions">
+                <button class="notification-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
+                        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
+                    </svg>
+                    <span class="notification-indicator"></span>
+                </button>
+                <button class="create-btn" id="createProjectBtn">Создать новый Проект</button>
+            </div>
+        </header>
+
+        <div class="card">
+            <div class="filter-container">
+                <div class="custom-select">
+                    <div class="select-trigger">
+                        <span>Все статусы</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m6 9 6 6 6-6" />
+                        </svg>
+                    </div>
+                    <div class="select-dropdown">
+                        <div class="select-option selected" data-value="all">Все статусы</div>
+                        <div class="select-option" data-value="development">В разработке</div>
+                        <div class="select-option" data-value="planning">Планирование</div>
+                        <div class="select-option" data-value="completed">Завершен</div>
+                    </div>
+                </div>
+                <div class="active-filter-indicator">
+                    <span id="activeFilterCount"></span>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="projects-table">
+                    <thead>
+                        <tr>
+                            <th>Название Проекта</th>
+                            <th>Статус</th>
+                            <th>Дедлайн</th>
+                            <th>Прогресс</th>
+                        </tr>
+                    </thead>
+                    <tbody id="projectsTableBody">
+                        <tr data-status="development">
+                            <td>To Do list</td>
+                            <td><span class="status status-development">В разработке</span></td>
+                            <td>2025-02-20</td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-indicator" style="width: 40%"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr data-status="completed">
+                            <td>The Revenants</td>
+                            <td><span class="status status-completed">Завершен</span></td>
+                            <td>2025-04-30</td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-indicator" style="width: 100%"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr data-status="planning">
+                            <td>Приложение для управления проектами</td>
+                            <td><span class="status status-planning">Планирование</span></td>
+                            <td>2025-08-19</td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-indicator" style="width: 15%"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr data-status="development">
+                            <td>Курс по виртуализации</td>
+                            <td><span class="status status-development">В разработке</span></td>
+                            <td>2025-09-05</td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-indicator" style="width: 70%"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="noProjectsMessage" class="no-projects-message" style="display: none;">
+                <p>Нет проектов, соответствующих выбранному фильтру</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для создания проекта -->
+    <div id="createProjectModal" class="task-modal">
+        <div class="task-modal-overlay"></div>
+        <div class="task-modal-content">
+            <h2>Создать новый проект</h2>
+            <form id="createProjectForm">
+                <div class="form-group">
+                    <label for="projectName">Название проекта</label>
+                    <input type="text" id="projectName" name="projectName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="projectStatus">Статус</label>
+                    <select id="projectStatus" name="projectStatus">
+                        <option value="planning">Планирование</option>
+                        <option value="development">В разработке</option>
+                        <option value="completed">Завершен</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="startDate">Дата начала</label>
+                        <input type="date" id="startDate" name="startDate">
+                    </div>
+
+                    <div class="form-group half">
+                        <label for="endDate">Дата конца</label>
+                        <input type="date" id="endDate" name="endDate">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="participants-header">
+                        <label>Участники проекта</label>
+                        <button type="button" class="add-participant-btn">+ Добавить участника</button>
+                    </div>
+
+                    <div id="participantsList" class="participants-list">
+                        <div class="participant">
+                            <div class="participant-avatar">ЕТ</div>
+                            <div class="participant-info">
+                                <div class="participant-name">Екатерина Тараканова</div>
+                                <div class="participant-role">Менеджер проекта</div>
+                            </div>
+                            <button type="button" class="remove-participant-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel">Отменить</button>
+                    <button type="submit" class="btn-save">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/storage.js"></script>
+    <script src="/js/script.js"></script>
+</body>
+
+</html>

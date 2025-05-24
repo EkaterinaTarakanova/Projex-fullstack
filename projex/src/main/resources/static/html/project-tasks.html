@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление задачами проекта</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .project-selector {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .project-name {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-right: 8px;
+        }
+
+        .dropdown-arrow {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .projects-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            z-index: 100;
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .dropdown-item:hover {
+            background: #f9fafb;
+        }
+
+        .dropdown-item.active {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .filters {
+            display: flex;
+            gap: 20px;
+        }
+
+        .filter-btn, .task-type-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px 0;
+            color: #666;
+            text-decoration: none;
+        }
+
+        .filter-btn.active, .task-type-btn.active {
+            color: #6366f1;
+            border-bottom: 2px solid #6366f1;
+        }
+
+        .filter-btn:hover, .task-type-btn:hover {
+            color: #6366f1;
+        }
+
+        .task-type-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .tasks-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .tasks-header {
+            display: grid;
+            grid-template-columns: 2fr 150px 120px 200px;
+            gap: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .task-item {
+            display: grid;
+            grid-template-columns: 2fr 150px 120px 200px;
+            gap: 20px;
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            align-items: center;
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-name {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #d1d5db;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 2px;
+            appearance: none;
+            position: relative;
+        }
+
+        .task-checkbox:checked {
+            background: #6366f1;
+            border-color: #6366f1;
+        }
+
+        .task-checkbox:checked::after {
+            content: "✓";
+            color: white;
+            position: absolute;
+            top: -2px;
+            left: 3px;
+            font-size: 14px;
+        }
+
+        .task-checkbox.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-info span {
+            font-weight: 500;
+            color: #111827;
+        }
+
+        .task-owner {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .task-status span {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-in-progress {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status-planning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .task-deadline {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .task-comments {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .comments-count {
+            color: #6366f1;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .add-comment-btn {
+            background: none;
+            border: none;
+            color: #6366f1;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .add-comment-btn:hover {
+            text-decoration: underline;
+        }
+
+        .comments-section {
+            grid-column: 1 / -1;
+            background: #f9fafb;
+            padding: 16px 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .comment-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .comment-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .comment-date {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .comment-text {
+            color: #4b5563;
+            font-size: 14px;
+        }
+
+        .no-tasks {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        /* Modal styles */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .comment-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #111827;
+        }
+
+        .modal-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 20px;
+        }
+
+        .modal-textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-cancel {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-cancel:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-primary {
+            background: #6366f1;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5856eb;
+        }
+
+        /* Navigation styles */
+        .main-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 20px;
+        }
+
+        .main-nav__user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .main-nav__avatar {
+            width: 40px;
+            height: 40px;
+            background: #6366f1;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .main-nav__username {
+            font-weight: 500;
+            color: #374151;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="main-nav__inner">
+            <div class="main-nav__left">
+                <a href="Index.html" class="main-nav__logo"><b>Projex</b></a>
+                <div class="main-nav__links">
+                    <a href="Index.html" class="main-nav__link">Проекты</a>
+                    <a href="project-tasks.html" class="main-nav__link active">Задачи</a>
+                </div>
+            </div>
+            <div class="main-nav__right">
+                <div class="main-nav__profile">
+                    <a href="profile.html" class="main-nav__profile-link">
+                        <span class="main-nav__avatar"></span>
+                        <span class="main-nav__username"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <div class="project-selector">
+                <h1 class="project-name" id="project-name">Проект: The Revenants</h1>
+                <span class="dropdown-arrow">▼</span>
+                <div class="projects-dropdown" id="projects-dropdown">
+                    <div class="dropdown-item active">The Revenants</div>
+                    <div class="dropdown-item">Все мои задачи</div>
+                </div>
+            </div>
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">Все задачи</button>
+                <button class="filter-btn" data-filter="active">Активные</button>
+                <button class="filter-btn" data-filter="completed">Завершенные</button>
+            </div>
+        </div>
+
+        <div class="task-type-filters">
+            <button class="task-type-btn active" data-type="all">Все задачи</button>
+            <button class="task-type-btn" data-type="personal">Личные задачи</button>
+        </div>
+
+        <div class="tasks-container">
+            <div class="tasks-header">
+                <div>Задача</div>
+                <div>Статус</div>
+                <div>Дедлайн</div>
+                <div>Комментарии</div>
+            </div>
+            <div id="tasks-list">
+                <!-- Задачи будут загружены через JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Comment Modal -->
+    <div class="comment-modal" id="comment-modal">
+        <div class="modal-header">Добавить комментарий</div>
+        <textarea class="modal-textarea" id="comment-text" placeholder="Введите ваш комментарий..."></textarea>
+        <div class="modal-actions">
+            <button class="btn btn-cancel" id="cancel-comment">Отмена</button>
+            <button class="btn btn-primary" id="add-comment">Добавить</button>
+        </div>
+    </div>
+
+    <!-- Storage utility script -->
+    <script>
+        // Простая реализация Storage для демонстрации
+        const Storage = {
+            initializeData() {
+                if (!localStorage.getItem('tasks')) {
+                    const sampleTasks = [
+                        {
+                            id: 1,
+                            name: 'Ввести боевые сцены',
+                            status: 'in_progress',
+                            deadline: '2024-02-15',
+                            completed: false,
+                            isPersonal: true,
+                            owner: 'Николай',
+                            projectId: 1,
+                            assignedTo: [1],
+                            comments: [
+                                {
+                                    author: 'Николай',
+                                    date: '2024-01-20 15:30',
+                                    text: 'Нужно добавить анимации для всех ударов'
+                                }
+                            ],
+                            commentsVisible: false
+                        },
+                        {
+                            id: 2,
+                            name: 'Нарисовать тултипы предметов',
+                            status: 'planning',
+                            deadline: '2024-02-20',
+                            completed: false,
+                            isPersonal: false,
+                            owner: 'Анна',
+                            projectId: 1,
+                            assignedTo: [1],
+                            comments: [],
+                            commentsVisible: false
+                        },
+                        {
+                            id: 3,
+                            name: 'Разослать блогерам пресс-кит',
+                            status: 'completed',
+                            deadline: '2024-02-10',
+                            completed: true,
+                            isPersonal: true,
+                            owner: 'Михаил',
+                            projectId: 1,
+                            assignedTo: [1],
+                            comments: [
+                                {
+                                    author: 'Михаил',
+                                    date: '2024-02-09 14:20',
+                                    text: 'Отправил 15 блогерам'
+                                },
+                                {
+                                    author: 'Анна',
+                                    date: '2024-02-10 09:15',
+                                    text: 'Отличная работа!'
+                                }
+                            ],
+                            commentsVisible: false
+                        }
+                    ];
+                    localStorage.setItem('tasks', JSON.stringify(sampleTasks));
+                }
+
+                if (!localStorage.getItem('user')) {
+                    const sampleUser = {
+                        id: 1,
+                        name: 'Николай Петров',
+                        email: 'nikolay@example.com'
+                    };
+                    localStorage.setItem('user', JSON.stringify(sampleUser));
+                }
+
+                if (!localStorage.getItem('projects')) {
+                    const sampleProjects = [
+                        {
+                            id: 1,
+                            name: 'The Revenants',
+                            participants: [
+                                { userId: 1, role: 'developer' }
+                            ]
+                        }
+                    ];
+                    localStorage.setItem('projects', JSON.stringify(sampleProjects));
+                }
+            },
+
+            getUser() {
+                return JSON.parse(localStorage.getItem('user') || 'null');
+            },
+
+            getTasks() {
+                return JSON.parse(localStorage.getItem('tasks') || '[]');
+            },
+
+            setTasks(tasks) {
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+            },
+
+            getProjects() {
+                return JSON.parse(localStorage.getItem('projects') || '[]');
+            }
+        };
+    </script>
+
+    <!-- Main script -->
+    <script>
+        // Вставьте здесь ваш JavaScript код из файла project-tasks-eFgb8IeCLwQM4tye4JfXPzI5bUbV7N.js
+        // Массив для хранения задач
+        let tasks = [];
+
+        // Текущий пользователь
+        let currentUser = null;
+
+        // Текущая задача для добавления комментария
+        let currentTaskId = null;
+
+        // Текущие фильтры
+        let currentTaskType = 'all'; // 'all' или 'personal'
+        let currentTaskStatus = 'all'; // 'all', 'active' или 'completed'
+
+        // DOM элементы
+        const tasksList = document.getElementById('tasks-list');
+        const commentModal = document.getElementById('comment-modal');
+        const overlay = document.getElementById('overlay');
+        const commentText = document.getElementById('comment-text');
+        const addCommentBtn = document.getElementById('add-comment');
+        const cancelCommentBtn = document.getElementById('cancel-comment');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const taskTypeButtons = document.querySelectorAll('.task-type-btn');
+        const projectSelector = document.querySelector('.project-selector');
+        const projectName = document.querySelector('.project-name');
+        const projectsDropdown = document.getElementById('projects-dropdown');
+
+        // Инициализация страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            // Инициализируем данные при первом запуске
+            Storage.initializeData();
+
+            // Проверяем авторизацию
+            currentUser = Storage.getUser();
+            if (!currentUser) {
+                // Для демонстрации создаем пользователя
+                currentUser = { id: 1, name: 'Николай Петров' };
+            }
+
+            // Обновляем UI пользователя
+            const usernameElement = document.querySelector('.main-nav__username');
+            const avatarElement = document.querySelector('.main-nav__avatar');
+            if (usernameElement && avatarElement) {
+                usernameElement.textContent = currentUser.name;
+                avatarElement.textContent = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            }
+
+            // Получаем ID проекта из URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('id') || '1';
+
+            // Загружаем задачи проекта
+            tasks = Storage.getTasks().filter(t => String(t.projectId) === String(projectId));
+
+            // Настраиваем обработчики событий
+            setupEventListeners();
+            
+            // Отображаем задачи
+            renderTasks();
+        });
+
+        // Настройка обработчиков событий
+        function setupEventListeners() {
+            // Обработчики для модального окна комментариев
+            if (cancelCommentBtn) {
+                cancelCommentBtn.addEventListener('click', closeModal);
+            }
+            if (overlay) {
+                overlay.addEventListener('click', closeModal);
+            }
+            
+            if (addCommentBtn) {
+                addCommentBtn.addEventListener('click', () => {
+                    if (commentText && commentText.value.trim() !== '') {
+                        addComment(currentTaskId, commentText.value);
+                        closeModal();
+                    }
+                });
+            }
+
+            // Обработчики для фильтров по статусу
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    currentTaskStatus = button.dataset.filter;
+                    applyFilters();
+                });
+            });
+            
+            // Обработчики для фильтров по типу задачи (все/личные)
+            taskTypeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    taskTypeButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    currentTaskType = button.dataset.type;
+                    applyFilters();
+                });
+            });
+            
+            // Обработчик для выпадающего списка проектов
+            if (projectSelector) {
+                projectSelector.addEventListener('click', () => {
+                    projectsDropdown.style.display = projectsDropdown.style.display === 'block' ? 'none' : 'block';
+                });
+            }
+            
+            // Закрытие выпадающего списка при клике вне его
+            document.addEventListener('click', (e) => {
+                if (projectSelector && !projectSelector.contains(e.target)) {
+                    projectsDropdown.style.display = 'none';
+                }
+            });
+        }
+
+        // Применение всех фильтров
+        function applyFilters() {
+            let filteredTasks = [...tasks];
+            
+            // Фильтр по типу задачи (все/личные)
+            if (currentTaskType === 'personal') {
+                filteredTasks = filteredTasks.filter(task => task.isPersonal);
+            }
+            
+            // Фильтр по статусу
+            if (currentTaskStatus === 'active') {
+                filteredTasks = filteredTasks.filter(task => !task.completed);
+            } else if (currentTaskStatus === 'completed') {
+                filteredTasks = filteredTasks.filter(task => task.completed);
+            }
+            
+            renderTasks(filteredTasks);
+        }
+
+        // Отрисовка списка задач
+        function renderTasks(filteredTasks = tasks) {
+            if (!tasksList) return;
+            
+            tasksList.innerHTML = '';
+            
+            if (!filteredTasks || filteredTasks.length === 0) {
+                tasksList.innerHTML = '<div class="no-tasks">Нет доступных задач</div>';
+                return;
+            }
+            
+            filteredTasks.forEach(task => {
+                if (!task) return;
+                
+                const taskElement = document.createElement('div');
+                taskElement.className = 'task-item';
+                
+                // Определяем статус и класс для статуса
+                const statusClass = getStatusClass(task.status);
+                const statusText = getStatusText(task.status);
+                
+                taskElement.innerHTML = `
+                    <div class="task-name">
+                        <input type="checkbox" class="task-checkbox ${task.isPersonal ? '' : 'disabled'}" 
+                            data-id="${task.id}" ${task.completed ? 'checked' : ''} 
+                            ${task.isPersonal ? '' : 'disabled'}>
+                        <div class="task-info">
+                            <span>${task.name}</span>
+                            <div class="task-owner">Владелец: ${task.owner}</div>
+                        </div>
+                    </div>
+                    <div class="task-status">
+                        <span class="${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="task-deadline">${formatDate(task.deadline)}</div>
+                    <div class="task-comments">
+                        <div class="comments-count" data-id="${task.id}">
+                            ${task.comments ? task.comments.length : 0} комментариев
+                        </div>
+                        <button class="add-comment-btn" data-id="${task.id}">+ Добавить</button>
+                    </div>
+                `;
+                
+                tasksList.appendChild(taskElement);
+                
+                // Добавляем секцию комментариев, если они есть и видимы
+                if (task.comments && task.comments.length > 0 && task.commentsVisible) {
+                    const commentsSection = document.createElement('div');
+                    commentsSection.className = 'comments-section';
+                    
+                    let commentsHTML = task.comments.map(comment => `
+                        <div class="comment-item">
+                            <div class="comment-header">
+                                <span class="comment-author">${comment.author}</span>
+                                <span class="comment-date">${comment.date}</span>
+                            </div>
+                            <div class="comment-text">${comment.text}</div>
+                        </div>
+                    `).join('');
+                    
+                    commentsSection.innerHTML = commentsHTML;
+                    tasksList.appendChild(commentsSection);
+                }
+            });
+            
+            // Добавляем обработчики событий
+            addTaskEventListeners();
+        }
+
+        // Добавление обработчиков событий для задач
+        function addTaskEventListeners() {
+            // Обработчики для чекбоксов
+            document.querySelectorAll('.task-checkbox:not(.disabled)').forEach(checkbox => {
+                checkbox.addEventListener('change', (e) => {
+                    const taskId = parseInt(e.target.dataset.id);
+                    toggleTaskCompletion(taskId);
+                });
+            });
+            
+            // Обработчики для кнопок добавления комментариев
+            document.querySelectorAll('.add-comment-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const taskId = parseInt(e.target.dataset.id);
+                    openAddCommentModal(taskId);
+                });
+            });
+            
+            // Обработчики для счетчиков комментариев
+            document.querySelectorAll('.comments-count').forEach(counter => {
+                counter.addEventListener('click', (e) => {
+                    const taskId = parseInt(e.target.dataset.id);
+                    toggleComments(taskId);
+                });
+            });
+        }
+
+        // Получение класса для статуса
+        function getStatusClass(status) {
+            const statusClasses = {
+                'todo': 'status-planning',
+                'in_progress': 'status-in-progress',
+                'completed': 'status-completed',
+                'planning': 'status-planning'
+            };
+            return statusClasses[status] || 'status-planning';
+        }
+
+        // Переключение статуса выполнения задачи
+        function toggleTaskCompletion(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            
+            if (task && task.isPersonal) {
+                task.completed = !task.completed;
+                
+                if (task.completed) {
+                    task.status = 'completed';
+                    task.statusClass = 'status-completed';
+                } else {
+                    task.status = 'in_progress';
+                    task.statusClass = 'status-in-progress';
+                }
+                
+                // Сохраняем изменения
+                Storage.setTasks(tasks);
+                
+                // Применяем текущие фильтры
+                applyFilters();
+            }
+        }
+
+        // Переключение видимости комментариев
+        function toggleComments(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            
+            if (task && task.comments && task.comments.length > 0) {
+                task.commentsVisible = !task.commentsVisible;
+                
+                // Применяем текущие фильтры
+                applyFilters();
+            }
+        }
+
+        // Открытие модального окна для добавления комментария
+        function openAddCommentModal(taskId) {
+            currentTaskId = taskId;
+            
+            if (commentModal) {
+                commentModal.style.display = 'flex';
+            }
+            if (overlay) {
+                overlay.style.display = 'block';
+            }
+            if (commentText) {
+                commentText.value = '';
+                commentText.focus();
+            }
+        }
+
+        // Закрытие модальных окон
+        function closeModal() {
+            if (commentModal) {
+                commentModal.style.display = 'none';
+            }
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+        }
+
+        // Добавление комментария
+        function addComment(taskId, text) {
+            const task = tasks.find(t => t.id === taskId);
+            
+            if (task) {
+                const now = new Date();
+                const formattedDate = `${now.getFullYear()}-${padZero(now.getMonth() + 1)}-${padZero(now.getDate())} ${padZero(now.getHours())}:${padZero(now.getMinutes())}`;
+                
+                if (!task.comments) {
+                    task.comments = [];
+                }
+                
+                task.comments.push({
+                    author: currentUser.name,
+                    date: formattedDate,
+                    text: text
+                });
+                
+                // Показываем комментарии после добавления нового
+                task.commentsVisible = true;
+                
+                // Сохраняем изменения
+                Storage.setTasks(tasks);
+                
+                // Применяем текущие фильтры
+                applyFilters();
+            }
+        }
+
+        // Добавление ведущего нуля для чисел меньше 10
+        function padZero(num) {
+            return num < 10 ? `0${num}` : num;
+        }
+
+        // Вспомогательные функции
+        function getStatusText(status) {
+            const statusMap = {
+                'todo': 'К выполнению',
+                'in_progress': 'В процессе',
+                'completed': 'Завершен',
+                'planning': 'Планирование'
+            };
+            return statusMap[status] || status;
+        }
+
+        function formatDate(dateString) {
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('ru-RU');
+            } catch (error) {
+                return dateString;
+            }
+        }
+    </script>
+</body>
+</html>

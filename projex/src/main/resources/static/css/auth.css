@@ -1,0 +1,269 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+}
+
+.auth-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 25px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #333;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    border-color: #5e3bee;
+    outline: none;
+}
+
+.btn-primary {
+    width: 100%;
+    background-color: #5e3bee;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:disabled {
+    background-color: #b3b3b3;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.btn-primary:not(:disabled):hover {
+    background-color: #4c2fd0;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(94, 59, 238, 0.2);
+}
+
+.btn-primary:not(:disabled):active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.form-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+.form-footer a {
+    color: #5e3bee;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.radio-label input[type="radio"] {
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.radio-text {
+    font-size: 14px;
+}
+
+/* Password strength styles */
+.password-strength-container {
+    margin-top: 10px;
+}
+
+.password-strength-bar {
+    height: 5px;
+    background-color: #e0e0e0;
+    border-radius: 3px;
+    margin-bottom: 5px;
+    overflow: hidden;
+}
+
+.strength-indicator {
+    height: 100%;
+    width: 0;
+    border-radius: 3px;
+    transition: width 0.3s, background-color 0.3s;
+}
+
+.strength-text {
+    font-size: 12px;
+    color: #666;
+}
+
+.strength-weak {
+    background-color: #ff4d4d;
+    width: 33%;
+}
+
+.strength-medium {
+    background-color: #ffaa00;
+    width: 66%;
+}
+
+.strength-strong {
+    background-color: #00cc44;
+    width: 100%;
+}
+
+/* Password requirements styles */
+.password-requirements {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    font-size: 13px;
+}
+
+.password-requirements p {
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.password-requirements ul {
+    list-style-type: none;
+    padding-left: 5px;
+}
+
+.password-requirements li {
+    margin-bottom: 3px;
+    color: #777;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s;
+}
+
+.password-requirements li.valid {
+    color: #00cc44;
+}
+
+.req-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    text-align: center;
+    line-height: 16px;
+    margin-right: 5px;
+    border-radius: 50%;
+    font-size: 12px;
+    transition: all 0.3s;
+}
+
+li.valid .req-icon {
+    color: #00cc44;
+}
+
+/* Input validation styles */
+.input-wrapper {
+    position: relative;
+}
+
+.validation-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.input-valid .validation-icon {
+    opacity: 1;
+    color: #00cc44;
+}
+
+.input-invalid .validation-icon {
+    opacity: 1;
+    color: #ff4d4d;
+}
+
+.error-message {
+    color: #ff4d4d;
+    font-size: 12px;
+    margin-top: 5px;
+    min-height: 15px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .auth-card {
+        padding: 20px;
+    }
+    
+    .radio-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

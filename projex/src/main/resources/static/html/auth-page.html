@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация и Регистрация</title>
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="main-nav__inner">
+            <div class="main-nav__left">
+                <a href="Index.html" class="main-nav__logo"><b>Projex</b></a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Login Form -->
+        <div class="auth-card" id="login-form">
+            <h1>Вход</h1>
+            <form id="login">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="login-email" placeholder="Введите ваш email" required>
+                        <div class="validation-icon">✓</div>
+                    </div>
+                    <div class="error-message" id="login-email-error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-password">Пароль</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="login-password" placeholder="Введите ваш пароль" required>
+                        <div class="validation-icon">✓</div>
+                    </div>
+                </div>
+                
+                <button type="submit" id="login-submit" class="btn-primary">Войти</button>
+                
+                <div class="form-footer">
+                    <span>Нет аккаунта? </span>
+                    <a href="#" id="show-register">Зарегистрироваться</a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Registration Form -->
+        <div class="auth-card" id="register-form" style="display: none;">
+            <h1>Регистрация</h1>
+            <form id="register">
+                <div class="form-group">
+                    <label for="register-name">Полное имя</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="register-name" placeholder="Введите ваше полное имя" required>
+                        <div class="validation-icon">✓</div>
+                    </div>
+                    <div class="error-message"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="register-email" placeholder="Введите ваш email" required>
+                        <div class="validation-icon">✓</div>
+                    </div>
+                    <div class="error-message"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-password">Пароль</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="register-password" placeholder="Введите ваш пароль" required>
+                        <div class="validation-icon">✓</div>
+                    </div>
+                    
+                    <div class="password-requirements">
+                        <p>Пароль должен содержать:</p>
+                        <ul>
+                            <li id="req-length">Минимум 8 символов</li>
+                            <li id="req-uppercase">Хотя бы одну заглавную букву</li>
+                            <li id="req-lowercase">Хотя бы одну строчную букву</li>
+                            <li id="req-number">Хотя бы одну цифру</li>
+                            <li id="req-special">Хотя бы один спецсимвол (!@#$%^&*)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="register-confirm-password">Подтверждение пароля</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="register-confirm-password" placeholder="Повторите ваш пароль" required>
+                        <div class="validation-icon">✓</div>
+                    </div>
+                    <div class="error-message"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Роль</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="role" value="manager" checked>
+                            <span class="radio-text">Менеджер проекта</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="role" value="participant">
+                            <span class="radio-text">Участник проекта</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" id="register-submit" class="btn-primary" disabled>Зарегистрироваться</button>
+                
+                <div class="form-footer">
+                    <span>Уже есть аккаунт? </span>
+                    <a href="#" id="show-login">Войти</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="/js/storage.js"></script>
+    <script src="/js/auth-page.js"></script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет | Projex</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <nav class="main-nav">
+        <div class="main-nav__inner">
+            <div class="main-nav__left">
+                <a href="Index.html" class="main-nav__logo"><b>Projex</b></a>
+                <div class="main-nav__links">
+                    <a href="Index.html" class="main-nav__link">Проекты</a>
+                    <a href="project-tasks.html" class="main-nav__link">Задачи</a>
+                </div>
+            </div>
+            <div class="main-nav__right">
+                <div class="main-nav__profile">
+                    <span class="main-nav__avatar">ИП</span>
+                    <span class="main-nav__username">Иван Петров</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="profile-container">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <!-- Аватар будет установлен через JavaScript -->
+                </div>
+                <div class="profile-info">
+                    <h1 class="profile-name"><!-- Имя будет установлено через JavaScript --></h1>
+                    <span class="profile-role"><!-- Роль будет установлена через JavaScript --></span>
+                </div>
+            </div>
+
+            <div class="profile-content">
+                <div class="profile-section">
+                    <h2>Личная информация</h2>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="label">Email:</span>
+                            <span class="value" id="profile-email"><!-- Email будет установлен через JavaScript --></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Роль в системе:</span>
+                            <span class="value" id="profile-system-role"><!-- Роль будет установлена через JavaScript --></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Дата регистрации:</span>
+                            <span class="value" id="profile-registration-date"><!-- Дата будет установлена через JavaScript --></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <h2>Активность</h2>
+                    <div class="activity-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="projects-count">0</div>
+                            <div class="stat-label">Проектов</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="tasks-count">0</div>
+                            <div class="stat-label">Активных задач</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="completed-tasks-count">0</div>
+                            <div class="stat-label">Выполненных задач</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <h2>Последние проекты</h2>
+                    <div class="recent-projects" id="recent-projects">
+                        <!-- Список последних проектов будет добавлен через JavaScript -->
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <h2>Текущие задачи</h2>
+                    <div class="current-tasks" id="current-tasks">
+                        <!-- Список текущих задач будет добавлен через JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/storage.js"></script>
+    <script src="/js/profile.js"></script>
+</body>
+
+</html> 
