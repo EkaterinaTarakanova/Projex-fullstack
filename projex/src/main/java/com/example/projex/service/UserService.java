@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -38,20 +39,15 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Object> loginUser(String username, String password) {
-        User user = userRepository.findByUsername(username)
+    public User authenticate(String email, String password) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("Invalid password");
         }
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("id", user.getId());
-        response.put("username", user.getUsername());
-        response.put("email", user.getEmail());
-        response.put("role", user.getRole());
-        return response;
+        return user;
     }
 
     @Transactional(readOnly = true)
@@ -62,4 +58,13 @@ public class UserService {
         response.put("message", "Current user endpoint");
         return response;
     }
+
+    public boolean userExists(String email) {
+        return userRepository.findByEmail(email).isPresent(); // Проверяем, существует ли пользователь
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
 } 

@@ -38,7 +38,7 @@ public class User {
     private Set<Task> tasks = new HashSet<>();
 
     public enum UserRole {
-        PROJECT_MANAGER,
+       PROJECT_MANAGER,
         PROJECT_MEMBER
     }
 } 

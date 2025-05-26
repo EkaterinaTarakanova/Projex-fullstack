@@ -107,170 +107,70 @@ document.addEventListener('DOMContentLoaded', () => {
     // Обработка регистрации
     registerFormElement.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        try {
-            // Проверяем, не существует ли уже пользователь с таким email
-            const users = Storage.getUsers();
-            const existingUser = users.find(u => u.email === emailInput.value.trim());
-            
-            if (existingUser) {
-                const emailError = document.querySelector('#register-form .form-group:nth-child(2) .error-message');
-                emailError.textContent = 'Пользователь с таким email уже существует';
-                return;
-            }
 
+        try {
             const userData = {
-                id: Date.now().toString(),
-                name: nameInput.value.trim(),
+                username: nameInput.value.trim(),
                 email: emailInput.value.trim(),
-                password: passwordInput.value,
+                password: passwordInput.value, // Сохраняем хешированный пароль
                 role: document.querySelector('input[name="role"]:checked').value,
-                projects: []
             };
 
-            // Сохраняем пользователя
-            Storage.addUser(userData);
-            Storage.setUser(userData);
+            // Отправляем данные на сервер
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData),
+            });
 
-            const projects = Storage.getProjects();
-
-            // Если это первый менеджер, создаем демо-проект
-            if (userData.role === 'manager' && projects.length === 0) {
-                const demoProject = {
-                    id: 'demo-project-manager',
-                    name: 'Демо проект менеджера',
-                    description: 'Это демонстрационный проект для нового менеджера',
-                    status: 'planning',
-                    startDate: new Date().toISOString().split('T')[0],
-                    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    managerId: userData.id,
-                    participants: [
-                        {
-                            userId: userData.id,
-                            role: 'manager',
-                            joinedAt: new Date().toISOString()
-                        }
-                    ]
-                };
-                Storage.addProject(demoProject);
-
-                // Создаем демо-задачи для проекта менеджера
-                const demoTasks = [
-                    {
-                        id: 'task1',
-                        projectId: demoProject.id,
-                        title: 'Планирование проекта',
-                        description: 'Создать план проекта и определить основные этапы',
-                        status: 'in_progress',
-                        priority: 'high',
-                        assigneeId: userData.id,
-                        createdAt: new Date().toISOString(),
-                        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-                    }
-                ];
-                demoTasks.forEach(task => Storage.addTask(task));
+            if (response.ok) {
+                // Успешная регистрация
+                const result = await response.json();
+                console.log('Пользователь зарегистрирован:', result);
+                window.location.href = '/html/Index.html';
+            } else {
+                const error = await response.text(); // Получаем текст ошибки
+                const emailError = document.querySelector('#register-form .form-group:nth-child(2) .error-message');
+                emailError.textContent = error; // Отображаем ошибку
+                console.error('Ошибка регистрации:', error);
             }
-            // Если это участник, добавляем его в демо-проект
-            else if (userData.role === 'participant') {
-                let demoProjectParticipant;
-                
-                // Проверяем, существует ли уже демо-проект для участников
-                const existingDemoProject = projects.find(p => p.id === 'demo-project-participant');
-                
-                if (!existingDemoProject) {
-                    // Создаем демо-проект для участников
-                    demoProjectParticipant = {
-                        id: 'demo-project-participant',
-                        name: 'Разработка веб-приложения',
-                        description: 'Проект по созданию современного веб-приложения',
-                        status: 'development',
-                        startDate: new Date().toISOString().split('T')[0],
-                        endDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                        managerId: 'demo-manager',
-                        participants: [
-                            {
-                                userId: 'demo-manager',
-                                role: 'manager',
-                                joinedAt: new Date().toISOString()
-                            },
-                            {
-                                userId: userData.id,
-                                role: 'participant',
-                                joinedAt: new Date().toISOString()
-                            }
-                        ]
-                    };
-                    Storage.addProject(demoProjectParticipant);
-
-                    // Создаем демо-задачи для участника
-                    const participantTasks = [
-                        {
-                            id: `task-${Date.now()}-1`,
-                            projectId: demoProjectParticipant.id,
-                            title: 'Разработка пользовательского интерфейса',
-                            description: 'Создать современный и удобный интерфейс для главной страницы',
-                            status: 'in_progress',
-                            priority: 'high',
-                            assigneeId: userData.id,
-                            createdAt: new Date().toISOString(),
-                            deadline: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-                        },
-                        {
-                            id: `task-${Date.now()}-2`,
-                            projectId: demoProjectParticipant.id,
-                            title: 'Оптимизация производительности',
-                            description: 'Провести оптимизацию загрузки страниц и работы с данными',
-                            status: 'todo',
-                            priority: 'medium',
-                            assigneeId: userData.id,
-                            createdAt: new Date().toISOString(),
-                            deadline: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-                        }
-                    ];
-                    participantTasks.forEach(task => Storage.addTask(task));
-                } else {
-                    // Добавляем нового участника в существующий демо-проект
-                    existingDemoProject.participants.push({
-                        userId: userData.id,
-                        role: 'participant',
-                        joinedAt: new Date().toISOString()
-                    });
-                    Storage.setProjects(projects.map(p => 
-                        p.id === 'demo-project-participant' ? existingDemoProject : p
-                    ));
-                }
-            }
-
-            // Перенаправляем на главную страницу
-            window.location.href = '/html/Index.html';
         } catch (error) {
             console.error('Ошибка при регистрации:', error);
             alert('Произошла ошибка при регистрации. Пожалуйста, попробуйте снова.');
         }
     });
 
+
     // Обработка входа
     const loginFormElement = document.getElementById('login');
-    loginFormElement.addEventListener('submit', (e) => {
+    // auth-page.js (исправленная версия)
+    loginFormElement.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         try {
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
-            const emailError = document.getElementById('login-email-error');
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: emailInput.value.trim(),
+                    password: passwordInput.value
+                }),
+            });
 
-            const users = Storage.getUsers();
-            const user = users.find(u => u.email === email && u.password === password);
-
-            if (user) {
-                Storage.setUser(user);
-                window.location.href = '/html/Index.html';
+            if (response.ok) {
+                window.location.href = '/html/index.html';
             } else {
-                emailError.textContent = 'Неверный email или пароль';
+                const errorElement = document.querySelector('#login-form .error-message');
+                if (errorElement) {
+                    errorElement.textContent = 'Неверный email или пароль';
+                }
             }
         } catch (error) {
-            console.error('Ошибка при входе:', error);
-            alert('Произошла ошибка при входе. Пожалуйста, попробуйте снова.');
+            console.error('Ошибка:', error);
         }
     });
-});
+})
