@@ -1,9 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Показ/скрытие форм
-    const loginForm = document.getElementById('login-form');
+    const loginForm = document.getElementById('login');
+    const loginEmailInput = document.getElementById('login-email'); // Переименовали
+    const loginPasswordInput = document.getElementById('login-password'); // Переименовали
+
     const registerForm = document.getElementById('register-form');
     const showRegister = document.getElementById('show-register');
     const showLogin = document.getElementById('show-login');
+
 
     showRegister.addEventListener('click', (e) => {
         e.preventDefault();
@@ -143,31 +146,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // Обработка входа
-    const loginFormElement = document.getElementById('login');
-    // auth-page.js (исправленная версия)
-    loginFormElement.addEventListener('submit', async (e) => {
+    // Обработчик отправки формы ВХОДА
+    loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         try {
+            console.log('Введенные данные:', {
+                email: loginEmailInput.value.trim(),
+                password: loginPasswordInput.value // Используем переименованную переменную
+            });
+
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    email: emailInput.value.trim(),
-                    password: passwordInput.value
+                    email: loginEmailInput.value.trim(),
+                    password: loginPasswordInput.value
                 }),
             });
 
             if (response.ok) {
                 window.location.href = '/html/index.html';
             } else {
-                const errorElement = document.querySelector('#login-form .error-message');
-                if (errorElement) {
-                    errorElement.textContent = 'Неверный email или пароль';
-                }
+                const error = await response.text();
+                document.querySelector('#login-form .error-message').textContent = error;
             }
         } catch (error) {
             console.error('Ошибка:', error);

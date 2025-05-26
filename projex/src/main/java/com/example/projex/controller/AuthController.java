@@ -31,6 +31,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials, HttpServletRequest request) {
+        System.out.println("Login attempt. Email: " + credentials.get("email") + " Password: " + credentials.get("password"));
         try {
             User user = userService.authenticate(
                     credentials.get("email"),
