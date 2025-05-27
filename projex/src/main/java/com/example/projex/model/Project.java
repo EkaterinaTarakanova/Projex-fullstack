@@ -25,6 +25,16 @@ public class Project {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private LocalDateTime startDate;
+
+    @Column(nullable = false)
+    private LocalDateTime endDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ProjectStatus status = ProjectStatus.PLANNING;
+
     @ManyToOne
     @JoinColumn(name = "manager_id", nullable = false)
     private User manager;
@@ -43,5 +53,14 @@ public class Project {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        if (status == null) {
+            status = ProjectStatus.PLANNING;
+        }
+    }
+
+    public enum ProjectStatus {
+        PLANNING,
+        DEVELOPMENT,
+        COMPLETED
     }
 } 

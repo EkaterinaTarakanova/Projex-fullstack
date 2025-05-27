@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Управление проектом</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
@@ -19,8 +20,8 @@
             <div class="main-nav__right">
                 <div class="main-nav__profile">
                     <a href="/html/profile.html" class="main-nav__profile-link">
-                        <span class="main-nav__avatar">ИП</span>
-                        <span class="main-nav__username">Иван Петров</span>
+                        <span class="main-nav__avatar"></span>
+                        <span class="main-nav__username"></span>
                     </a>
                 </div>
             </div>
@@ -29,8 +30,19 @@
 
     <div class="container">
         <div class="header">
-            <h1>Проект: The Revenants</h1>
-            <button id="create-task-btn" class="create-task-btn">Создать задачу</button>
+            <h1>Проект: </h1>
+            <div class="project-actions">
+                <button id="create-task-btn" class="create-task-btn">
+                    <i class="fas fa-plus"></i>
+                    Создать задачу
+                </button>
+                <button class="edit-project-btn secondary-button action-btn">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="delete-project-btn secondary-button action-btn">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
         </div>
 
         <div class="content">
@@ -39,16 +51,16 @@
                     <h2>Информация о проекте</h2>
                     <div class="info-item">
                         <span class="label">Статус:</span>
-                        <span class="value"><span class="status-dev">В разработке</span></span>
+                        <span class="value"><span class="status-dev"></span></span>
                     </div>
                     <div class="info-item">
                         <span class="label">Дедлайн:</span>
-                        <span class="value">2025-04-30</span>
+                        <span class="value deadline-value"></span>
                     </div>
                     <div class="info-item">
                         <span class="label">Прогресс:</span>
                         <div class="progress-bar">
-                            <div class="progress" style="width: 35%;"></div>
+                            <div class="progress" style="width: 0%;"></div>
                         </div>
                     </div>
                 </div>
@@ -70,6 +82,7 @@
                             <th>Исполнитель</th>
                             <th>Статус</th>
                             <th>Дедлайн</th>
+                            <th>Действия</th>
                         </tr>
                     </thead>
                     <tbody id="tasks-tbody">
@@ -103,9 +116,9 @@
                 <div class="form-group">
                     <label for="task-priority">Приоритет</label>
                     <select id="task-priority">
-                        <option value="low">Низкий</option>
-                        <option value="medium" selected>Средний</option>
-                        <option value="high">Высокий</option>
+                        <option value="Низкий">Низкий</option>
+                        <option value="Средний" selected>Средний</option>
+                        <option value="Высокий">Высокий</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -119,6 +132,206 @@
             </form>
         </div>
     </div>
+
+    <style>
+        .action-btn {
+            height: 38px;
+            width: 38px;
+            padding: 0;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #6c757d;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        .action-btn:hover {
+            background-color: #545b62;
+        }
+
+        .task-action-btn {
+            height: 32px;
+            width: 32px;
+            padding: 0;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            transition: background-color 0.3s;
+            margin: 0 2px;
+        }
+
+        .task-action-btn.edit {
+            background-color: #8c959d;
+        }
+
+        .task-action-btn.edit:hover {
+            background-color: #6c757d;
+        }
+
+        .task-action-btn.delete {
+            background-color: #9a3c48;
+        }
+
+        .task-action-btn.delete:hover {
+            background-color: #842029;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-end;
+        }
+
+        .secondary-button {
+            border: none;
+            outline: none;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .remove-participant {
+            height: 24px;
+            width: 24px;
+            padding: 0;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #9a3c48;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        .remove-participant:hover {
+            background-color: #842029;
+        }
+
+        .participant {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px;
+            margin-bottom: 5px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .task-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+        }
+
+        .task-modal.show {
+            display: block;
+        }
+
+        .task-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+        }
+
+        .task-modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            z-index: 1002;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-save,
+        .btn-cancel {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .add-participant-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .add-participant-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
 
     <script src="/js/storage.js"></script>
     <script src="/js/project-page.js"></script>

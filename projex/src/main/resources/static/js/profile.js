@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Проверяем авторизацию
     const currentUser = Storage.getUser();
     if (!currentUser) {
@@ -7,9 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Обновляем информацию в шапке
-    document.querySelector('.main-nav__username').textContent = currentUser.name;
-    document.querySelector('.main-nav__avatar').textContent = 
-        currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+    document.querySelector('.main-nav__username').textContent = currentUser.username;
+    document.querySelector('.main-nav__avatar').textContent =
+        currentUser.username.split(' ').map(n => n[0]).join('').toUpperCase();
 
     // Обновляем профиль пользователя
     const profileAvatar = document.querySelector('.profile-avatar');
@@ -20,12 +20,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const profileRegistrationDate = document.getElementById('profile-registration-date');
 
     // Устанавливаем основную информацию
-    profileAvatar.textContent = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
-    profileName.textContent = currentUser.name;
-    profileRole.textContent = currentUser.role === 'manager' ? 'Менеджер проекта' : 'Участник проекта';
+    profileAvatar.textContent = currentUser.username.split(' ').map(n => n[0]).join('').toUpperCase();
+    profileName.textContent = currentUser.username;
+    // Все пользователи теперь менеджеры проектов
+    profileRole.textContent = 'Менеджер проекта';
     profileEmail.textContent = currentUser.email;
-    profileSystemRole.textContent = currentUser.role === 'manager' ? 'Менеджер проекта' : 'Участник проекта';
-    profileRegistrationDate.textContent = new Date(parseInt(currentUser.id)).toLocaleDateString('ru-RU');
+    profileSystemRole.textContent = 'Менеджер проекта';
+
+    // Используем текущую дату, если дата регистрации не указана
+    const registrationDate = currentUser.registrationDate ? new Date(currentUser.registrationDate) : new Date();
+    profileRegistrationDate.textContent = registrationDate.toLocaleDateString('ru-RU');
 
     // Загружаем статистику
     loadStatistics();
@@ -43,19 +47,19 @@ function loadStatistics() {
     const tasks = Storage.getTasks();
 
     // Считаем проекты пользователя
-    const userProjects = projects.filter(project => 
+    const userProjects = projects.filter(project =>
         project.participants.some(p => p.userId === currentUser.id)
     );
     document.getElementById('projects-count').textContent = userProjects.length;
 
     // Считаем активные задачи
-    const activeTasks = tasks.filter(task => 
+    const activeTasks = tasks.filter(task =>
         task.assigneeId === currentUser.id && task.status !== 'completed'
     );
     document.getElementById('tasks-count').textContent = activeTasks.length;
 
     // Считаем выполненные задачи
-    const completedTasks = tasks.filter(task => 
+    const completedTasks = tasks.filter(task =>
         task.assigneeId === currentUser.id && task.status === 'completed'
     );
     document.getElementById('completed-tasks-count').textContent = completedTasks.length;

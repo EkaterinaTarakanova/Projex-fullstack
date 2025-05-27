@@ -6,8 +6,22 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
+    // Инициализируем тестовые данные
+    Storage.initializeData();
+
+    // Отображаем имя текущего пользователя
+    const avatarElement = document.querySelector('.main-nav__avatar');
+    const usernameElement = document.querySelector('.main-nav__username');
+    if (avatarElement && usernameElement) {
+        const initials = currentUser.username.split(' ')
+            .map(n => n[0])
+            .join('');
+        avatarElement.textContent = initials;
+        usernameElement.textContent = currentUser.username;
+    }
+
     const createTaskBtn = document.getElementById('create-task-btn');
-    const modal = document.getElementById('task-modal');
+    const taskModal = document.getElementById('task-modal');
     const modalOverlay = document.getElementById('modal-overlay');
     const cancelBtn = document.getElementById('cancel-btn');
     const taskForm = document.getElementById('task-form');
@@ -24,157 +38,328 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Загружаем данные проекта
-    const project = Storage.getProjects().find(p => String(p.id) === String(projectId));
+    let project;
 
-    // Если проект не найден, перенаправляем на главную
-    if (!project) {
-        alert('Проект не найден');
-        window.location.href = '/html/Index.html';
-        return;
-    }
-
-    // Проверяем права доступа
-    const userParticipant = project.participants.find(p => p.userId === currentUser.id);
-    if (!userParticipant) {
-        alert('У вас нет доступа к этому проекту');
-        window.location.href = '/html/Index.html';
-        return;
-    }
-
-    // Обновляем UI в зависимости от роли
-    if (currentUser.role !== 'manager') {
-        createTaskBtn.style.display = 'none';
-        document.querySelector('.role-toggle').style.display = 'none';
-    }
-
-    // Обновляем информацию о пользователе
-    document.querySelector('.main-nav__username').textContent = currentUser.name;
-    document.querySelector('.main-nav__avatar').textContent = 
-        currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
-
-    // Обновляем навигацию
-    const navLinks = document.querySelector('.main-nav__links');
-    if (currentUser.role === 'manager') {
-        navLinks.innerHTML = `
-            <a href="#" class="main-nav__link active">${project.name}</a>
-        `;
-    } else {
-        navLinks.innerHTML = `
-            <a href="/html/project-tasks.html?id=${project.id}" class="main-nav__link">${project.name} - Задачи</a>
-        `;
-    }
-
-    // Обновляем заголовок и информацию о проекте
-    document.querySelector('h1').textContent = `Проект: ${project.name}`;
-    
-    // Обновляем статус проекта
-    const statusElement = document.querySelector('.status-dev');
-    statusElement.textContent = getStatusText(project.status);
-    statusElement.className = `status-${project.status}`;
-
-    // Обновляем дедлайн
-    document.querySelector('.info-item:nth-child(2) .value').textContent = 
-        formatDate(project.endDate);
-
-    // Загружаем задачи проекта и обновляем прогресс
-    function loadTasks() {
-        const tasks = Storage.getTasks().filter(t => t.projectId === projectId);
-        tasksTableBody.innerHTML = '';
-
-        if (tasks.length > 0) {
-            tasks.forEach(task => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${task.title}</td>
-                    <td>${getUserName(task.assigneeId)}</td>
-                    <td><span class="status-${task.status}">${getStatusText(task.status)}</span></td>
-                    <td>${formatDate(task.deadline)}</td>
-                `;
-                tasksTableBody.appendChild(tr);
-            });
-
-            // Обновляем прогресс
-            const completed = tasks.filter(t => t.status === 'completed').length;
-            const progress = Math.round((completed / tasks.length) * 100);
-            document.querySelector('.progress').style.width = `${progress}%`;
-        } else {
-            tasksTableBody.innerHTML = '<tr><td colspan="4">Нет задач</td></tr>';
-            document.querySelector('.progress').style.width = '0%';
+    function loadProject() {
+        try {
+            project = Storage.getProject(projectId);
+            if (!project) {
+                throw new Error('Проект не найден');
+            }
+            updateProjectUI();
+        } catch (error) {
+            console.error('Ошибка загрузки проекта:', error);
+            alert('Проект не найден');
+            window.location.href = '/html/Index.html';
         }
     }
 
-    // Обновляем список участников
-    function loadParticipants() {
+    function updateProjectUI() {
+        try {
+            // Обновляем заголовок и информацию о проекте
+            const titleElement = document.querySelector('h1');
+            if (titleElement) {
+                titleElement.textContent = `Проект: ${project.name}`;
+            }
+
+            // Обновляем статус проекта
+            const statusElement = document.querySelector('.status-dev');
+            if (statusElement) {
+                statusElement.textContent = project.status;
+                statusElement.className = `status-${project.status.toLowerCase()}`;
+            }
+
+            // Обновляем дедлайн
+            const deadlineElement = document.querySelector('.info-item:nth-child(2) .value');
+            if (deadlineElement) {
+                deadlineElement.textContent = formatDate(project.endDate);
+            }
+
+            // Обновляем прогресс
+            updateProgress();
+
+            // Обновляем список участников
+            updateParticipantsList();
+        } catch (error) {
+            console.error('Ошибка при обновлении UI проекта:', error);
+        }
+    }
+
+    function updateProgress() {
+        const tasks = Storage.getProjectTasks(projectId);
+        const progress = tasks.length > 0
+            ? (tasks.filter(t => t.status === 'Завершена').length / tasks.length) * 100
+            : 0;
+        document.querySelector('.progress').style.width = `${progress}%`;
+    }
+
+    function updateParticipantsList() {
         const participantsList = document.querySelector('.participants-list');
         participantsList.innerHTML = '';
 
-        project.participants.forEach(participant => {
-            const user = Storage.getUsers().find(u => u.id === participant.userId);
+        const users = Storage.getUsers();
+        project.participants.forEach(participantId => {
+            const user = users.find(u => u.id === participantId);
             if (user) {
-                const div = document.createElement('div');
-                div.className = 'participant';
-                div.innerHTML = `
-                    <div class="avatar">${user.name.split(' ').map(n => n[0]).join('').toUpperCase()}</div>
-                    <div class="participant-info">
-                        <div class="name">${user.name}</div>
-                        <div class="role">${participant.role === 'manager' ? 'Менеджер проекта' : 'Участник проекта'}</div>
-                    </div>
+                const participantElement = document.createElement('div');
+                participantElement.className = 'participant';
+                participantElement.innerHTML = `
+                    <span>${user.username}</span>
+                    <button type="button" class="remove-participant" data-user-id="${user.id}">
+                        <i class="fas fa-times"></i>
+                    </button>
                 `;
-                participantsList.appendChild(div);
+                participantsList.appendChild(participantElement);
+
+                // Добавляем обработчик для кнопки удаления
+                const removeBtn = participantElement.querySelector('.remove-participant');
+                removeBtn.addEventListener('click', () => {
+                    if (confirm(`Вы уверены, что хотите удалить участника ${user.username} из проекта?`)) {
+                        // Удаляем участника из списка
+                        project.participants = project.participants.filter(id => id !== user.id);
+
+                        // Обновляем проект в хранилище
+                        Storage.updateProject(projectId, project);
+
+                        // Обновляем отображение списка участников
+                        updateParticipantsList();
+
+                        // Проверяем задачи этого участника
+                        const tasks = Storage.getProjectTasks(projectId);
+                        const userTasks = tasks.filter(t => t.assigneeId === user.id);
+
+                        if (userTasks.length > 0) {
+                            // Если у участника есть задачи, меняем их статус на "К выполнению" и убираем исполнителя
+                            userTasks.forEach(task => {
+                                Storage.updateTask(task.id, {
+                                    ...task,
+                                    assigneeId: '',
+                                    status: 'К выполнению'
+                                });
+                            });
+                            // Обновляем отображение задач
+                            loadTasks();
+                            updateProgress();
+                        }
+                    }
+                });
             }
         });
     }
 
-    // Обработка создания задачи
-    taskForm.addEventListener('submit', function (e) {
-        e.preventDefault();
+    // Загрузка задач проекта
+    function loadTasks() {
+        try {
+            const tasks = Storage.getProjectTasks(projectId);
+            tasksTableBody.innerHTML = '';
 
-        const taskData = {
-            id: Date.now().toString(),
-            projectId: projectId,
-            title: document.getElementById('task-name').value.trim(),
-            description: document.getElementById('task-description').value.trim(),
-            assigneeId: document.getElementById('task-assignee').value,
-            status: 'todo',
-            priority: document.getElementById('task-priority').value.toLowerCase(),
-            createdAt: new Date().toISOString(),
-            deadline: document.getElementById('task-deadline').value,
-            createdBy: currentUser.id
-        };
+            if (tasks.length === 0) {
+                tasksTableBody.innerHTML = '<tr><td colspan="5">Нет задач</td></tr>';
+                return;
+            }
 
-        // Сохраняем задачу
-        const tasks = Storage.getTasks();
-        tasks.push(taskData);
-        Storage.setTasks(tasks);
+            tasks.forEach(task => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${task.title}</td>
+                    <td>${getAssigneeName(task.assigneeId)}</td>
+                    <td><span class="status-${task.status.toLowerCase()}">${task.status}</span></td>
+                    <td>${formatDate(task.deadline)}</td>
+                    <td class="task-actions">
+                        <button class="task-action-btn edit" data-task-id="${task.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="task-action-btn delete" data-task-id="${task.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tasksTableBody.appendChild(tr);
 
-        // Обновляем UI
-        loadTasks();
-        closeModal();
-    });
-
-    // Вспомогательные функции
-    function getStatusText(status) {
-        const statusMap = {
-            'planning': 'Планирование',
-            'development': 'В разработке',
-            'completed': 'Завершен',
-            'todo': 'К выполнению',
-            'in_progress': 'В работе'
-        };
-        return statusMap[status] || status;
+                // Добавляем обработчики для кнопок
+                tr.querySelector('.task-action-btn.edit').addEventListener('click', () => showEditTaskModal(task));
+                tr.querySelector('.task-action-btn.delete').addEventListener('click', () => deleteTask(task.id));
+            });
+        } catch (error) {
+            console.error('Ошибка при загрузке задач:', error);
+            tasksTableBody.innerHTML = '<tr><td colspan="5">Ошибка при загрузке задач</td></tr>';
+        }
     }
 
+    // Функция получения имени исполнителя
+    function getAssigneeName(assigneeId) {
+        const users = Storage.getUsers();
+        const user = users.find(u => u.id === assigneeId);
+        return user ? user.username : 'Не назначен';
+    }
+
+    // Обработка создания задачи
+    taskForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        try {
+            const assigneeId = document.getElementById('task-assignee').value;
+
+            if (!assigneeId) {
+                alert('Пожалуйста, выберите исполнителя задачи');
+                return;
+            }
+
+            // Если исполнитель не является участником проекта, добавляем его
+            if (!project.participants.includes(assigneeId)) {
+                project.participants.push(assigneeId);
+                Storage.updateProject(projectId, project);
+            }
+
+            const taskData = {
+                id: Date.now().toString(), // Генерируем уникальный ID
+                title: document.getElementById('task-name').value,
+                description: document.getElementById('task-description').value,
+                assigneeId: assigneeId,
+                priority: document.getElementById('task-priority').value,
+                deadline: new Date(document.getElementById('task-deadline').value).toISOString(),
+                projectId: projectId,
+                status: 'К выполнению'
+            };
+
+            Storage.addTask(taskData);
+            closeModal();
+            loadTasks();
+            updateProgress();
+            updateProjectUI();
+        } catch (error) {
+            console.error('Ошибка при создании задачи:', error);
+            alert('Не удалось создать задачу: ' + error.message);
+        }
+    });
+
+    // Функция удаления задачи
+    function deleteTask(taskId) {
+        if (confirm('Вы уверены, что хотите удалить эту задачу?')) {
+            try {
+                Storage.deleteTask(taskId);
+                loadTasks();
+                updateProgress();
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Не удалось удалить задачу');
+            }
+        }
+    }
+
+    // Функция редактирования задачи
+    function showEditTaskModal(task) {
+        const modal = document.createElement('div');
+        modal.className = 'task-modal show';
+        modal.innerHTML = `
+            <div class="task-modal-overlay"></div>
+            <div class="task-modal-content">
+                <h2>Редактировать задачу</h2>
+                <form id="edit-task-form">
+                    <div class="form-group">
+                        <label for="edit-task-title">Название задачи</label>
+                        <input type="text" id="edit-task-title" value="${task.title}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-task-description">Описание</label>
+                        <textarea id="edit-task-description">${task.description || ''}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-task-assignee">Исполнитель</label>
+                        <select id="edit-task-assignee" required>
+                            ${Storage.getUsers()
+                .filter(user => user.role === "DEVELOPER")
+                .map(user => `
+                                    <option value="${user.id}" ${user.id === task.assigneeId ? 'selected' : ''}>
+                                        ${user.username}
+                                    </option>
+                                `).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-task-status">Статус</label>
+                        <select id="edit-task-status">
+                            <option value="К выполнению" ${task.status === 'К выполнению' ? 'selected' : ''}>К выполнению</option>
+                            <option value="В работе" ${task.status === 'В работе' ? 'selected' : ''}>В работе</option>
+                            <option value="Завершена" ${task.status === 'Завершена' ? 'selected' : ''}>Завершена</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-task-priority">Приоритет</label>
+                        <select id="edit-task-priority">
+                            <option value="Низкий" ${task.priority === 'Низкий' ? 'selected' : ''}>Низкий</option>
+                            <option value="Средний" ${task.priority === 'Средний' ? 'selected' : ''}>Средний</option>
+                            <option value="Высокий" ${task.priority === 'Высокий' ? 'selected' : ''}>Высокий</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-task-deadline">Дедлайн</label>
+                        <input type="date" id="edit-task-deadline" value="${task.deadline.split('T')[0]}" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel">Отменить</button>
+                        <button type="submit" class="btn-save">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const form = modal.querySelector('#edit-task-form');
+        const cancelBtn = modal.querySelector('.btn-cancel');
+        const modalOverlay = modal.querySelector('.task-modal-overlay');
+
+        modalOverlay.addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const newAssigneeId = document.getElementById('edit-task-assignee').value;
+
+            // Если новый исполнитель не является участником проекта, добавляем его
+            if (!project.participants.includes(newAssigneeId)) {
+                project.participants.push(newAssigneeId);
+                Storage.updateProject(projectId, project);
+            }
+
+            const updatedTask = {
+                ...task,
+                title: document.getElementById('edit-task-title').value,
+                description: document.getElementById('edit-task-description').value,
+                assigneeId: newAssigneeId,
+                status: document.getElementById('edit-task-status').value,
+                priority: document.getElementById('edit-task-priority').value,
+                deadline: new Date(document.getElementById('edit-task-deadline').value).toISOString()
+            };
+
+            try {
+                Storage.updateTask(task.id, updatedTask);
+                document.body.removeChild(modal);
+                loadTasks();
+                updateProgress();
+                updateProjectUI();
+            } catch (error) {
+                console.error('Ошибка при обновлении задачи:', error);
+                alert('Не удалось обновить задачу');
+            }
+        });
+    }
+
+    // Функция форматирования даты
     function formatDate(dateString) {
         return new Date(dateString).toLocaleDateString('ru-RU');
     }
 
-    function getUserName(userId) {
-        const user = Storage.getUsers().find(u => u.id === userId);
-        return user ? user.name : 'Неизвестный пользователь';
-    }
-
+    // Функция закрытия модального окна
     function closeModal() {
-        modal.style.display = 'none';
+        taskModal.style.display = 'none';
         modalOverlay.style.display = 'none';
         taskForm.reset();
     }
@@ -184,24 +369,18 @@ document.addEventListener('DOMContentLoaded', function () {
         // Заполняем список исполнителей
         const assigneeSelect = document.getElementById('task-assignee');
         assigneeSelect.innerHTML = '<option value="" disabled selected>Выберите исполнителя</option>';
-        
-        project.participants.forEach(participant => {
-            const user = Storage.getUsers().find(u => u.id === participant.userId);
-            if (user) {
-                const option = document.createElement('option');
-                option.value = user.id;
-                option.textContent = user.name;
-                assigneeSelect.appendChild(option);
-            }
+
+        const users = Storage.getUsers();
+        const developers = users.filter(user => user.role === "DEVELOPER");
+        developers.forEach(user => {
+            const option = document.createElement('option');
+            option.value = user.id;
+            option.textContent = user.username;
+            assigneeSelect.appendChild(option);
         });
 
-        modal.style.display = 'block';
+        taskModal.style.display = 'block';
         modalOverlay.style.display = 'block';
-
-        // Устанавливаем дедлайн по умолчанию на завтра
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        document.getElementById('task-deadline').valueAsDate = tomorrow;
     });
 
     cancelBtn.addEventListener('click', closeModal);
@@ -211,7 +390,179 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Обработчики для кнопок редактирования и удаления проекта
+    document.querySelector('.edit-project-btn').addEventListener('click', showEditProjectModal);
+    document.querySelector('.delete-project-btn').addEventListener('click', deleteProject);
+
+    // Функция удаления проекта
+    function deleteProject() {
+        if (confirm('Вы уверены, что хотите удалить этот проект?')) {
+            try {
+                Storage.deleteProject(projectId);
+                window.location.href = '/html/Index.html';
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Не удалось удалить проект');
+            }
+        }
+    }
+
+    // Функция показа модального окна редактирования проекта
+    function showEditProjectModal() {
+        const modal = document.createElement('div');
+        modal.className = 'task-modal show';
+        modal.innerHTML = `
+            <div class="task-modal-overlay"></div>
+            <div class="task-modal-content">
+                <h2>Редактировать проект</h2>
+                <form id="edit-project-form">
+                    <div class="form-group">
+                        <label for="edit-project-name">Название проекта</label>
+                        <input type="text" id="edit-project-name" value="${project.name}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-project-status">Статус</label>
+                        <select id="edit-project-status">
+                            <option value="Планирование" ${project.status === 'Планирование' ? 'selected' : ''}>Планирование</option>
+                            <option value="Разработка" ${project.status === 'Разработка' ? 'selected' : ''}>Разработка</option>
+                            <option value="Завершен" ${project.status === 'Завершен' ? 'selected' : ''}>Завершен</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-project-end-date">Дедлайн</label>
+                        <input type="date" id="edit-project-end-date" value="${project.endDate.split('T')[0]}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Участники проекта</label>
+                        <div id="edit-project-participants">
+                            ${project.participants.map(participantId => {
+            const user = Storage.getUsers().find(u => u.id === participantId);
+            return user ? `
+                                    <div class="participant">
+                                        <span>${user.username}</span>
+                                        <button type="button" class="remove-participant" data-user-id="${user.id}">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                ` : '';
+        }).join('')}
+                        </div>
+                        <button type="button" class="add-participant-btn">
+                            <i class="fas fa-user-plus"></i>
+                            Добавить участника
+                        </button>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel">Отменить</button>
+                        <button type="submit" class="btn-save">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Обработчики для модального окна
+        const form = modal.querySelector('#edit-project-form');
+        const cancelBtn = modal.querySelector('.btn-cancel');
+        const addParticipantBtn = modal.querySelector('.add-participant-btn');
+        const participantsContainer = modal.querySelector('#edit-project-participants');
+        const modalOverlay = modal.querySelector('.task-modal-overlay');
+
+        // Обработчик клика по оверлею
+        modalOverlay.addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+
+        // Обработчик добавления участника
+        addParticipantBtn.addEventListener('click', () => {
+            const users = Storage.getUsers();
+            const availableUsers = users.filter(user =>
+                !project.participants.includes(user.id) && user.role === "DEVELOPER"
+            );
+
+            if (availableUsers.length === 0) {
+                alert('Нет доступных пользователей для добавления');
+                return;
+            }
+
+            const select = document.createElement('select');
+            select.className = 'form-control';
+            availableUsers.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = user.username;
+                select.appendChild(option);
+            });
+
+            const addButton = document.createElement('button');
+            addButton.type = 'button';
+            addButton.className = 'btn-save';
+            addButton.textContent = 'Добавить';
+            addButton.onclick = () => {
+                const userId = select.value;
+                if (userId && !project.participants.includes(userId)) {
+                    project.participants.push(userId);
+                    const user = users.find(u => u.id === userId);
+                    const participantElement = document.createElement('div');
+                    participantElement.className = 'participant';
+                    participantElement.innerHTML = `
+                        <span>${user.username}</span>
+                        <button type="button" class="remove-participant" data-user-id="${user.id}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    participantsContainer.appendChild(participantElement);
+                    select.remove();
+                    addButton.remove();
+                }
+            };
+
+            const container = document.createElement('div');
+            container.className = 'add-participant-container';
+            container.appendChild(select);
+            container.appendChild(addButton);
+            participantsContainer.appendChild(container);
+        });
+
+        // Обработчик удаления участника
+        participantsContainer.addEventListener('click', (e) => {
+            const removeBtn = e.target.closest('.remove-participant');
+            if (removeBtn) {
+                const userId = removeBtn.dataset.userId;
+                project.participants = project.participants.filter(id => id !== userId);
+                removeBtn.closest('.participant').remove();
+            }
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const updatedProject = {
+                ...project,
+                name: document.getElementById('edit-project-name').value,
+                status: document.getElementById('edit-project-status').value,
+                endDate: new Date(document.getElementById('edit-project-end-date').value).toISOString(),
+                participants: project.participants
+            };
+
+            try {
+                Storage.updateProject(projectId, updatedProject);
+                project = Storage.getProject(projectId);
+                updateProjectUI();
+                document.body.removeChild(modal);
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Не удалось обновить проект');
+            }
+        });
+    }
+
     // Инициализация
+    loadProject();
     loadTasks();
-    loadParticipants();
 });

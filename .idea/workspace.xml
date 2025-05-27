@@ -6,12 +6,21 @@
   <component name="ChangeListManager">
     <list default="true" id="23aa94f6-96e2-40f1-bc2e-9e6506c2dc35" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/html/Index.html" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/resources/static/html/Index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/controller/ProjectController.java" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/controller/ProjectController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/model/Project.java" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/model/Project.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/model/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/service/CommentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/service/CommentService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/service/ProjectService.java" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/service/ProjectService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/service/TaskService.java" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/service/TaskService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/service/UserService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/html/auth-page.html" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/resources/static/html/auth-page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/html/profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/resources/static/html/profile.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/html/project-page.html" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/resources/static/html/project-page.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/html/project-tasks.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/js/auth-page.js" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/resources/static/js/auth-page.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/js/profile.js" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/resources/static/js/profile.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/js/project-page.js" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/resources/static/js/project-page.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/js/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/resources/static/js/script.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projexdb.mv.db" beforeDir="false" afterPath="$PROJECT_DIR$/projexdb.mv.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/js/storage.js" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/resources/static/js/storage.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -122,7 +131,7 @@
       <workItem from="1748171518097" duration="4782000" />
       <workItem from="1748237861808" duration="23438000" />
       <workItem from="1748266126122" duration="2259000" />
-      <workItem from="1748329477849" duration="1010000" />
+      <workItem from="1748329477849" duration="11761000" />
     </task>
     <servers />
   </component>

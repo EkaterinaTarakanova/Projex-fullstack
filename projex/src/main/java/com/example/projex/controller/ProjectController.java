@@ -14,9 +14,14 @@ import java.util.List;
 public class ProjectController {
     private final ProjectService projectService;
 
+    @GetMapping
+    public ResponseEntity<List<Project>> getAllProjects() {
+        return ResponseEntity.ok(projectService.getAllProjects());
+    }
+
     @PostMapping
-    public ResponseEntity<Project> createProject(@RequestBody Project project, @RequestParam Long managerId) {
-        return ResponseEntity.ok(projectService.createProject(project, managerId));
+    public ResponseEntity<Project> createProject(@RequestBody Project project) {
+        return ResponseEntity.ok(projectService.createProject(project));
     }
 
     @PostMapping("/{projectId}/participants/{userId}")
@@ -37,5 +42,16 @@ public class ProjectController {
     @GetMapping("/{projectId}")
     public ResponseEntity<Project> getProject(@PathVariable Long projectId) {
         return ResponseEntity.ok(projectService.getProject(projectId));
+    }
+
+    @PutMapping("/{projectId}")
+    public ResponseEntity<Project> updateProject(@PathVariable Long projectId, @RequestBody Project project) {
+        return ResponseEntity.ok(projectService.updateProject(projectId, project));
+    }
+
+    @DeleteMapping("/{projectId}")
+    public ResponseEntity<Void> deleteProject(@PathVariable Long projectId) {
+        projectService.deleteProject(projectId);
+        return ResponseEntity.ok().build();
     }
 } 

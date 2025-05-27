@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // Проверяем авторизацию
     const currentUser = Storage.getUser();
     if (!currentUser) {
@@ -13,39 +13,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const projectsTableBody = document.getElementById('projectsTableBody');
     const noProjectsMessage = document.getElementById('noProjectsMessage');
 
-    
-    // Скрываем кнопку создания проекта для не-менеджеров
-    if (currentUser.role !== 'manager') {
-        createProjectBtn.style.display = 'none';
-    }
+    // Теперь все пользователи - менеджеры проектов
+    // Кнопка создания проекта видна всем
+    createProjectBtn.style.display = 'block';
 
     // Отображаем имя пользователя и аватар
     const usernameElement = document.querySelector('.main-nav__username');
     const avatarElement = document.querySelector('.main-nav__avatar');
     if (usernameElement && avatarElement) {
-        usernameElement.textContent = currentUser.name;
-        avatarElement.textContent = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+        usernameElement.textContent = currentUser.username;
+        avatarElement.textContent = currentUser.username.split(' ').map(n => n[0]).join('').toUpperCase();
     }
 
     // Загружаем проекты
     function loadProjects() {
         try {
             const projects = Storage.getProjects();
-            const filteredProjects = currentUser.role === 'manager' 
-                ? projects.filter(p => p.managerId === currentUser.id)
-                : projects.filter(p => p.participants.some(part => part.userId === currentUser.id));
 
             // Очищаем таблицу
             projectsTableBody.innerHTML = '';
 
-            if (filteredProjects.length === 0) {
+            if (projects.length === 0) {
                 noProjectsMessage.style.display = 'block';
                 return;
             }
 
             noProjectsMessage.style.display = 'none';
 
-            filteredProjects.forEach(project => {
+            projects.forEach(project => {
                 const tr = document.createElement('tr');
                 tr.dataset.status = project.status;
                 tr.innerHTML = `
@@ -59,11 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </td>
                 `;
                 tr.addEventListener('click', () => {
-                    // Определяем URL в зависимости от роли пользователя
-                    const targetUrl = currentUser.role === 'manager' 
-                        ? `/html/project-page.html?id=${project.id}`
-                        : `/html/project-tasks.html?id=${project.id}`;
-                    window.location.href = targetUrl;
+                    window.location.href = `/html/project-page.html?id=${project.id}`;
                 });
                 projectsTableBody.appendChild(tr);
             });
@@ -96,24 +87,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const projectData = {
-                id: String(Date.now()),
                 name,
                 status,
-                startDate,
-                endDate,
+                startDate: new Date(startDate).toISOString(),
+                endDate: new Date(endDate).toISOString(),
                 managerId: currentUser.id,
-                participants: [
-                    {
-                        userId: currentUser.id,
-                        role: 'manager',
-                        joinedAt: new Date().toISOString()
-                    }
-                ]
+                participants: [{
+                    userId: currentUser.id,
+                    role: 'PROJECT_MANAGER',
+                    joinedAt: new Date().toISOString()
+                }]
             };
 
             Storage.addProject(projectData);
             closeModal();
-            loadProjects();
+            loadProjects(); // Перезагружаем список проектов
         } catch (error) {
             console.error('Ошибка при создании проекта:', error);
             alert('Произошла ошибка при создании проекта');
@@ -123,19 +111,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Вспомогательные функции
     function getStatusText(status) {
         const statusMap = {
-            'planning': 'Планирование',
-            'development': 'В разработке',
-            'completed': 'Завершен'
+            'PLANNING': 'Планирование',
+            'DEVELOPMENT': 'В разработке',
+            'COMPLETED': 'Завершен'
         };
         return statusMap[status] || status;
     }
 
     function calculateProgress(project) {
         try {
-            const tasks = Storage.getTasks().filter(t => t.projectId === project.id);
+            const tasks = Storage.getProjectTasks(project.id);
             if (tasks.length === 0) return 0;
-            
-            const completed = tasks.filter(t => t.status === 'completed').length;
+
+            const completed = tasks.filter(t => t.status === 'COMPLETED').length;
             return Math.round((completed / tasks.length) * 100);
         } catch (error) {
             console.error('Ошибка при расчете прогресса:', error);

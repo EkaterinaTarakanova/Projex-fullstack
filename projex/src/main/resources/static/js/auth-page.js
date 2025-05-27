@@ -115,8 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const userData = {
                 username: nameInput.value.trim(),
                 email: emailInput.value.trim(),
-                password: passwordInput.value, // Сохраняем хешированный пароль
-                role: document.querySelector('input[name="role"]:checked').value,
+                password: passwordInput.value,
+                role: 'PROJECT_MANAGER', // Всегда устанавливаем роль менеджера проекта
+                registrationDate: new Date().toISOString() // Добавляем дату регистрации
             };
 
             // Отправляем данные на сервер
@@ -131,12 +132,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 // Успешная регистрация
                 const result = await response.json();
-                console.log('Пользователь зарегистрирован:', result);
+                // Сохраняем данные пользователя
+                Storage.setUser(result);
                 window.location.href = '/html/Index.html';
             } else {
-                const error = await response.text(); // Получаем текст ошибки
+                const error = await response.text();
                 const emailError = document.querySelector('#register-form .form-group:nth-child(2) .error-message');
-                emailError.textContent = error; // Отображаем ошибку
+                emailError.textContent = error;
                 console.error('Ошибка регистрации:', error);
             }
         } catch (error) {
@@ -168,6 +170,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
+                const userData = await response.json();
+                // Сохраняем данные пользователя в localStorage
+                Storage.setUser(userData);
                 window.location.href = '/html/index.html';
             } else {
                 const error = await response.text();
