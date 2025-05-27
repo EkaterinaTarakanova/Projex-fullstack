@@ -51,7 +51,6 @@ public class AuthController {
         }
     }
 
-
     @GetMapping("/user")
     public ResponseEntity<?> getCurrentUser() {
         return ResponseEntity.ok(userService.getCurrentUser());

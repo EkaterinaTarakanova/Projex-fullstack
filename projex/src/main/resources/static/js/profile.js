@@ -126,10 +126,13 @@ function loadCurrentTasks() {
 function getStatusText(status) {
     const statusMap = {
         'planning': 'Планирование',
+        'PLANNING': 'Планирование',
         'development': 'В разработке',
+        'DEVELOPMENT': 'В разработке',
         'completed': 'Завершен',
+        'COMPLETED': 'Завершен',
         'todo': 'К выполнению',
         'in_progress': 'В работе'
     };
-    return statusMap[status] || status;
+    return statusMap[status] || 'Планирование';
 } 

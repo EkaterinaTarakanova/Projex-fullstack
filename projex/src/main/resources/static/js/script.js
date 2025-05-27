@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Обработка создания проекта
     const createProjectForm = document.getElementById('createProjectForm');
-    createProjectForm.addEventListener('submit', (e) => {
+    createProjectForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         try {
@@ -100,6 +100,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
 
             Storage.addProject(projectData);
+            await Logger.log(Logger.Actions.PROJECT_CREATE, `Создан проект: ${name}`);
             closeModal();
             loadProjects(); // Перезагружаем список проектов
         } catch (error) {
@@ -112,10 +113,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     function getStatusText(status) {
         const statusMap = {
             'PLANNING': 'Планирование',
+            'planning': 'Планирование',
             'DEVELOPMENT': 'В разработке',
-            'COMPLETED': 'Завершен'
+            'development': 'В разработке',
+            'COMPLETED': 'Завершен',
+            'completed': 'Завершен'
         };
-        return statusMap[status] || status;
+        return statusMap[status] || 'Планирование';
     }
 
     function calculateProgress(project) {

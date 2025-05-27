@@ -113,13 +113,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Добавляем обработчик для кнопки удаления
                 const removeBtn = participantElement.querySelector('.remove-participant');
-                removeBtn.addEventListener('click', () => {
+                removeBtn.addEventListener('click', async () => {
                     if (confirm(`Вы уверены, что хотите удалить участника ${user.username} из проекта?`)) {
                         // Удаляем участника из списка
                         project.participants = project.participants.filter(id => id !== user.id);
 
                         // Обновляем проект в хранилище
                         Storage.updateProject(projectId, project);
+                        await Logger.log(Logger.Actions.PARTICIPANT_REMOVE, `Удален участник ${user.username} из проекта ${project.name}`);
 
                         // Обновляем отображение списка участников
                         updateParticipantsList();
@@ -130,13 +131,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         if (userTasks.length > 0) {
                             // Если у участника есть задачи, меняем их статус на "К выполнению" и убираем исполнителя
-                            userTasks.forEach(task => {
-                                Storage.updateTask(task.id, {
+                            for (const task of userTasks) {
+                                const updatedTask = {
                                     ...task,
                                     assigneeId: '',
                                     status: 'К выполнению'
-                                });
-                            });
+                                };
+                                Storage.updateTask(task.id, updatedTask);
+                                await Logger.log(Logger.Actions.TASK_UPDATE,
+                                    `Задача "${task.title}" переведена в статус "К выполнению" после удаления исполнителя`);
+                            }
                             // Обновляем отображение задач
                             loadTasks();
                             updateProgress();
@@ -193,12 +197,29 @@ document.addEventListener('DOMContentLoaded', function () {
         return user ? user.username : 'Не назначен';
     }
 
+    // Функция удаления задачи
+    async function deleteTask(taskId) {
+        if (confirm('Вы уверены, что хотите удалить эту задачу?')) {
+            try {
+                const task = Storage.getTask(taskId);
+                Storage.deleteTask(taskId);
+                await Logger.log(Logger.Actions.TASK_DELETE, `Удалена задача: ${task.title}`);
+                loadTasks();
+                updateProgress();
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Не удалось удалить задачу');
+            }
+        }
+    }
+
     // Обработка создания задачи
-    taskForm.addEventListener('submit', (e) => {
+    taskForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         try {
             const assigneeId = document.getElementById('task-assignee').value;
+            const taskName = document.getElementById('task-name').value;
 
             if (!assigneeId) {
                 alert('Пожалуйста, выберите исполнителя задачи');
@@ -209,11 +230,12 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!project.participants.includes(assigneeId)) {
                 project.participants.push(assigneeId);
                 Storage.updateProject(projectId, project);
+                await Logger.log(Logger.Actions.PARTICIPANT_ADD, `Добавлен участник ${assigneeId} в проект ${project.name}`);
             }
 
             const taskData = {
-                id: Date.now().toString(), // Генерируем уникальный ID
-                title: document.getElementById('task-name').value,
+                id: Date.now().toString(),
+                title: taskName,
                 description: document.getElementById('task-description').value,
                 assigneeId: assigneeId,
                 priority: document.getElementById('task-priority').value,
@@ -223,6 +245,7 @@ document.addEventListener('DOMContentLoaded', function () {
             };
 
             Storage.addTask(taskData);
+            await Logger.log(Logger.Actions.TASK_CREATE, `Создана задача: ${taskName} в проекте ${project.name}`);
             closeModal();
             loadTasks();
             updateProgress();
@@ -232,20 +255,6 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('Не удалось создать задачу: ' + error.message);
         }
     });
-
-    // Функция удаления задачи
-    function deleteTask(taskId) {
-        if (confirm('Вы уверены, что хотите удалить эту задачу?')) {
-            try {
-                Storage.deleteTask(taskId);
-                loadTasks();
-                updateProgress();
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('Не удалось удалить задачу');
-            }
-        }
-    }
 
     // Функция редактирования задачи
     function showEditTaskModal(task) {
@@ -318,7 +327,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.removeChild(modal);
         });
 
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const newAssigneeId = document.getElementById('edit-task-assignee').value;
@@ -327,6 +336,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!project.participants.includes(newAssigneeId)) {
                 project.participants.push(newAssigneeId);
                 Storage.updateProject(projectId, project);
+                const newUser = Storage.getUsers().find(u => u.id === newAssigneeId);
+                await Logger.log(Logger.Actions.PARTICIPANT_ADD,
+                    `Добавлен участник ${newUser ? newUser.username : newAssigneeId} в проект ${project.name}`);
             }
 
             const updatedTask = {
@@ -341,6 +353,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             try {
                 Storage.updateTask(task.id, updatedTask);
+                await Logger.log(Logger.Actions.TASK_UPDATE,
+                    `Обновлена задача "${updatedTask.title}" (статус: ${updatedTask.status}, приоритет: ${updatedTask.priority})`);
                 document.body.removeChild(modal);
                 loadTasks();
                 updateProgress();
@@ -395,9 +409,10 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('.delete-project-btn').addEventListener('click', deleteProject);
 
     // Функция удаления проекта
-    function deleteProject() {
+    async function deleteProject() {
         if (confirm('Вы уверены, что хотите удалить этот проект?')) {
             try {
+                await Logger.log(Logger.Actions.PROJECT_DELETE, `Удален проект: ${project.name}`);
                 Storage.deleteProject(projectId);
                 window.location.href = '/html/Index.html';
             } catch (error) {
@@ -423,9 +438,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="form-group">
                         <label for="edit-project-status">Статус</label>
                         <select id="edit-project-status">
-                            <option value="Планирование" ${project.status === 'Планирование' ? 'selected' : ''}>Планирование</option>
-                            <option value="Разработка" ${project.status === 'Разработка' ? 'selected' : ''}>Разработка</option>
-                            <option value="Завершен" ${project.status === 'Завершен' ? 'selected' : ''}>Завершен</option>
+                            <option value="Планирование">Планирование</option>
+                            <option value="В разработке">В разработке</option>
+                            <option value="Завершен">Завершен</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -539,7 +554,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.removeChild(modal);
         });
 
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const updatedProject = {
@@ -552,6 +567,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             try {
                 Storage.updateProject(projectId, updatedProject);
+                await Logger.log(Logger.Actions.PROJECT_UPDATE,
+                    `Обновлен проект "${updatedProject.name}" (статус: ${updatedProject.status})`);
                 project = Storage.getProject(projectId);
                 updateProjectUI();
                 document.body.removeChild(modal);

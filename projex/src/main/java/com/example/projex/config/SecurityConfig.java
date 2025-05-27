@@ -19,54 +19,21 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers(
-                                "/h2-console/**",
-                                "/api/auth/register",
-                                "/api/auth/login"
-                        )
-                )
-                .headers(headers -> headers
-                        .frameOptions(frameOptions -> frameOptions.sameOrigin())
-                )
-                .authorizeHttpRequests(authorize -> authorize
-                        // Разрешаем доступ к статическим ресурсам
-                        .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers(
-                                "/",
-                                "/html/**",
-                                "/css/**",
-                                "/js/**",
-                                "/images/**"
-                        ).permitAll()
-
-                        // Разрешаем регистрацию и логин
-                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
-                        .requestMatchers("/html/login.html").permitAll()
-
-                        // Настройка доступа для ролей
-                        .requestMatchers("/api/manager/**").hasRole("PROJECT_MANAGER")
-                        .requestMatchers("/api/member/**").hasRole("PROJECT_MEMBER")
-                        .anyRequest().authenticated()
-                )
-
-                .logout(logout -> logout
-                        .logoutUrl("/api/auth/logout")
-                        .logoutSuccessUrl("/html/login.html")
-                        .permitAll()
-                )
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-                )
-                //.sessionManagement(session -> session
-                        // Удалите строку:
-                        // .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                ;
-
-
+            .csrf(csrf -> csrf.disable())  // Отключаем CSRF для простоты
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/").permitAll()  // Разрешаем доступ к корневому пути
+                .requestMatchers("/api/logs").permitAll()  // Разрешаем доступ к логам
+                .requestMatchers("/api/auth/**").permitAll()  // Разрешаем доступ к авторизации
+                .requestMatchers("/css/**", "/js/**", "/html/**", "/images/**", "/*.html", "/*.js", "/*.css").permitAll()  // Разрешаем доступ к статическим ресурсам
+                .requestMatchers("/static/**").permitAll()  // Разрешаем доступ к статическим ресурсам
+                .anyRequest().permitAll()  // Временно разрешаем все запросы
+            )
+            .headers(headers -> headers
+                .frameOptions(frameOptions -> frameOptions.disable())  // Отключаем X-Frame-Options
+            );
+        
         return http.build();
     }
 

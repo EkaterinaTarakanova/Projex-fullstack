@@ -5,22 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="23aa94f6-96e2-40f1-bc2e-9e6506c2dc35" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/modules/projex.main.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/projex.main.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/controller/ProjectController.java" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/controller/ProjectController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/model/Project.java" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/model/Project.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/model/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/service/CommentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/service/CommentService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/service/ProjectService.java" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/service/ProjectService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/service/TaskService.java" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/service/TaskService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/html/auth-page.html" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/resources/static/html/auth-page.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projex/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/projex/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projex/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/projex/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/java/com/example/projex/controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projex/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/html/Index.html" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/resources/static/html/Index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/html/project-page.html" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/resources/static/html/project-page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/html/project-tasks.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/js/auth-page.js" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/resources/static/js/auth-page.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/js/profile.js" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/resources/static/js/profile.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/js/project-page.js" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/resources/static/js/project-page.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/js/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/resources/static/js/script.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/projex/src/main/resources/static/js/storage.js" beforeDir="false" afterPath="$PROJECT_DIR$/projex/src/main/resources/static/js/storage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/projexdb.mv.db" beforeDir="false" afterPath="$PROJECT_DIR$/projexdb.mv.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,27 +80,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Gradle.Build projex.executor&quot;: &quot;Run&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;Spring Boot.ProjexApplication.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Katyusha/Documents/GitHub/Projex-fullstack&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Gradle.Build projex.executor": "Run",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Spring Boot.ProjexApplication.executor": "Run",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/Katyusha/Documents/GitHub/Projex-fullstack",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="ProjexApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="projex.main" />
@@ -131,7 +130,8 @@
       <workItem from="1748171518097" duration="4782000" />
       <workItem from="1748237861808" duration="23438000" />
       <workItem from="1748266126122" duration="2259000" />
-      <workItem from="1748329477849" duration="11761000" />
+      <workItem from="1748329477849" duration="12014000" />
+      <workItem from="1748347999543" duration="2703000" />
     </task>
     <servers />
   </component>
