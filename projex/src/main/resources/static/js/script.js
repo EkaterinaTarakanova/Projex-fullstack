@@ -12,21 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelBtn = modal.querySelector('.btn-cancel');
     const projectsTableBody = document.getElementById('projectsTableBody');
     const noProjectsMessage = document.getElementById('noProjectsMessage');
-    
-    // Настраиваем навигацию в зависимости от роли
-    const navLinks = document.querySelector('.main-nav__links');
-    if (currentUser.role === 'manager') {
-        // Для менеджера показываем только проекты
-        navLinks.innerHTML = `
-            <a href="Index.html" class="main-nav__link active">Проекты</a>
-        `;
-    } else {
-        // Для участника показываем проекты и задачи
-        navLinks.innerHTML = `
-            <a href="Index.html" class="main-nav__link active">Проекты</a>
-            <a href="project-tasks.html" class="main-nav__link">Мои задачи</a>
-        `;
-    }
+
     
     // Скрываем кнопку создания проекта для не-менеджеров
     if (currentUser.role !== 'manager') {

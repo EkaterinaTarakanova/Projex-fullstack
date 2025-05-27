@@ -56,12 +56,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const navLinks = document.querySelector('.main-nav__links');
     if (currentUser.role === 'manager') {
         navLinks.innerHTML = `
-            <a href="/html/Index.html" class="main-nav__link">Проекты</a>
             <a href="#" class="main-nav__link active">${project.name}</a>
         `;
     } else {
         navLinks.innerHTML = `
-            <a href="/html/Index.html" class="main-nav__link">Проекты</a>
             <a href="/html/project-tasks.html?id=${project.id}" class="main-nav__link">${project.name} - Задачи</a>
         `;
     }
